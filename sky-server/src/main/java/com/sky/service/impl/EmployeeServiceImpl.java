@@ -64,6 +64,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         //3、返回实体对象
         return employee;
     }
+
     public void save(EmployeeDTO employeeDTO) {
         Employee employee = new Employee();
         //对象属性拷贝
@@ -86,7 +87,8 @@ public class EmployeeServiceImpl implements EmployeeService {
         //保存数据
         employeeMapper.insert(employee);
     }
-  //分页查询
+
+    //分页查询
     public PageResult pageQuery(EmployeePageQueryDTO employeePageQueryDTO) {
         //开始分页
         PageHelper.startPage(employeePageQueryDTO.getPage(), employeePageQueryDTO.getPageSize());
@@ -94,6 +96,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         // Page<Employee> = 一个装员工数据的分页盒子。盒子里不仅有当前页员工列表，还自动带上查询出来的总数量。
         return new PageResult(page.getTotal(), page.getResult());//返回分页结果，包含总记录数和当前页数据集合
     }
+
     //启用禁用员工
     public void startOrStop(Integer status, Long id) {
         //根据id修改状态
@@ -103,4 +106,21 @@ public class EmployeeServiceImpl implements EmployeeService {
         employeeMapper.update(employee);
     }
 
+    //根据id查询员工
+    public Employee getById(Long id) {
+        Employee employee = employeeMapper.getById(id);
+        employee.setPassword("****");//隐藏密码
+        return employee;
+    }
+
+    //修改员工
+    public void update(EmployeeDTO employeeDTO) {
+        Employee employee = new Employee();
+        BeanUtils.copyProperties(employeeDTO, employee);//对象属性拷贝，将employeeDTO中的属性值赋值给employee
+        employee.setUpdateUser(BaseContext.getCurrentId());//设置更新人
+        employee.setUpdateTime(LocalDateTime.now());//设置更新时间
+        employeeMapper.update(employee);
+    }
+
 }
+

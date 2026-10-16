@@ -102,4 +102,20 @@ public class EmployeeController {
         employeeService.startOrStop(status, id);
         return Result.success();
     }
+    //根据id查询员工回显
+    @GetMapping("/{id}")
+    @ApiOperation(value = "根据id查询员工", notes = "根据id查询员工，返回员工对象")//swagger注解，用于生成接口文档时显示的注释
+    public Result<Employee> getById(@PathVariable Long id){
+        log.info("根据id查询员工：{}", id);
+        Employee employee = employeeService.getById(id);
+        return Result.success(employee);
+    }
+    //修改员工
+    @PutMapping
+    @ApiOperation(value = "修改员工", notes = "修改员工，返回员工对象")//swagger注解，用于生成接口文档时显示的注释
+    public Result update(@RequestBody EmployeeDTO employeeDTO){
+        log.info("修改员工：{}", employeeDTO);
+        employeeService.update(employeeDTO);
+        return Result.success();
+    }
 }
