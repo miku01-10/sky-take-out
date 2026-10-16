@@ -94,5 +94,13 @@ public class EmployeeServiceImpl implements EmployeeService {
         // Page<Employee> = 一个装员工数据的分页盒子。盒子里不仅有当前页员工列表，还自动带上查询出来的总数量。
         return new PageResult(page.getTotal(), page.getResult());//返回分页结果，包含总记录数和当前页数据集合
     }
+    //启用禁用员工
+    public void startOrStop(Integer status, Long id) {
+        //根据id修改状态
+        Employee employee = new Employee();
+        employee.setStatus(status);
+        employee.setId(id);
+        employeeMapper.update(employee);
+    }
 
 }

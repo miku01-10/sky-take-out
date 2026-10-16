@@ -93,4 +93,13 @@ public class EmployeeController {
         PageResult pageResult = employeeService.pageQuery(employeePageQueryDTO);//赋值给pageResult对象，表示分页查询的结果
         return Result.success(pageResult);
     }
+    //修改员工状态
+    //启用禁用员工
+    @PostMapping("/status/{status}")
+    @ApiOperation(value = "启用禁用员工", notes = "启用禁用员工")//swagger注解，用于生成接口文档时显示的注释
+    public Result updateStatus(@PathVariable Integer status,Long id){
+        log.info("启用禁用员工：{}", id);
+        employeeService.startOrStop(status, id);
+        return Result.success();
+    }
 }
