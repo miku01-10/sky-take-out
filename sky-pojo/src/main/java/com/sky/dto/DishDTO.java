@@ -6,7 +6,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-
+//具体解释：定义一个类，用于接收前端传递的菜品数据
 @Data
 public class DishDTO implements Serializable {
 

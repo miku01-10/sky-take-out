@@ -12,9 +12,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-@Builder
+@Builder//构建器模式,vo类中使用,用于创建对象时,可以使用链式调用,而不需要使用构造方法
 @NoArgsConstructor
 @AllArgsConstructor
+//这就是用来返回的类，用于菜品分页查询，包含菜品分类名称和菜品口味信息
 public class DishVO implements Serializable {
 
     private Long id;

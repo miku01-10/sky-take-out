@@ -75,15 +75,18 @@ public class EmployeeServiceImpl implements EmployeeService {
         //设置默认密码，使用md5加密,依旧使用常量类来获取默认密码（constant包中的常量类）
         employee.setPassword(DigestUtils.md5DigestAsHex(PasswordConstant.DEFAULT_PASSWORD.getBytes()));
         //设置创建时间
-        employee.setCreateTime(LocalDateTime.now());
+//        employee.setCreateTime(LocalDateTime.now());
         //设置更新时间
-        employee.setUpdateTime(LocalDateTime.now());
+//        employee.setUpdateTime(LocalDateTime.now());
         //设置创建人
         //TODO 设置创建人和更新人
-        employee.setCreateUser(BaseContext.getCurrentId());
+        //为什么不能直接getId()方法获取当前用户ID？
+        //BaseContext.getCurrentId()获取当前线程中的用户ID
+        //BaseContext.getCurrentId()获取当前线程中的用户ID，如果不这样设置，那么创建人和更新人将都为null
+//        employee.setCreateUser(BaseContext.getCurrentId());//这里使用BaseContext.getCurrentId()获取当前线程中的用户ID，如果不这样设置，那么创建人和更新人将都为null
         //设置更新人
         //TODO 设置创建人和更新人
-        employee.setUpdateUser(BaseContext.getCurrentId());
+//        employee.setUpdateUser(BaseContext.getCurrentId());
         //保存数据
         employeeMapper.insert(employee);
     }
@@ -117,8 +120,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     public void update(EmployeeDTO employeeDTO) {
         Employee employee = new Employee();
         BeanUtils.copyProperties(employeeDTO, employee);//对象属性拷贝，将employeeDTO中的属性值赋值给employee
-        employee.setUpdateUser(BaseContext.getCurrentId());//设置更新人
-        employee.setUpdateTime(LocalDateTime.now());//设置更新时间
+//        employee.setUpdateUser(BaseContext.getCurrentId());//设置更新人
+//        employee.setUpdateTime(LocalDateTime.now());//设置更新时间
         employeeMapper.update(employee);
     }
 
