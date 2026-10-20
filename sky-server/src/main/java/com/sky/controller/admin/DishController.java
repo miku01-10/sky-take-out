@@ -24,7 +24,7 @@ public class DishController {
     private DishService dishService;
     //新增菜品
     @PostMapping()
-   public Result save(DishDTO dishDTO){
+    public Result save(@RequestBody DishDTO dishDTO){
         log.info("新增菜品：{}", dishDTO);
         dishService.saveWithFlavor(dishDTO);
         return Result.success();
@@ -60,6 +60,21 @@ public class DishController {
     public Result update(@RequestBody DishDTO dishDTO){
         log.info("修改菜品：{}", dishDTO);
         dishService.updateWithFlavor(dishDTO);
+        return Result.success();
+    }
+    //根据id查询菜品，主要是用来套餐中加菜品的
+    @GetMapping("/list")
+    @ApiOperation(value = "根据id查询菜品，主要是用来套餐中加菜品的", tags = "根据id查询菜品，主要是用来套餐中加菜品的")
+    public Result<List<DishVO>> list(@RequestParam Long categoryId){
+        List<DishVO> dishVOList = dishService.list(categoryId);
+        return Result.success(dishVOList);
+    }
+    //修改菜品状态
+    @PostMapping("/status/{status}")
+    @ApiOperation(value = "修改菜品状态", tags = "修改菜品状态")
+    public Result updateStatus(@PathVariable Integer status, @RequestParam Long id){
+        log.info("修改菜品状态：{}", status);
+        dishService.updateStatus(status, id);
         return Result.success();
     }
 }

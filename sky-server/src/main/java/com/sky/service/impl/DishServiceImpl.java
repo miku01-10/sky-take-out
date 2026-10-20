@@ -3,6 +3,7 @@ package com.sky.service.impl;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.sky.constant.MessageConstant;
+import com.sky.constant.StatusConstant;
 import com.sky.dto.DishDTO;
 import com.sky.dto.DishPageQueryDTO;
 import com.sky.entity.Dish;
@@ -40,12 +41,12 @@ public class DishServiceImpl implements DishService {
         BeanUtils.copyProperties(dishDTO, dish);
         //向菜品表插入1个数据
         dishMapper.insert(dish);
-        //获取菜品的id
+        //获取菜品的id，目的是为了设置菜品口味的菜品id
         Long dishId = dish.getId();//这个是在DishFlavorMapper.xml中设置的，
         // 因为DishFlavorMapper.xml中设置了useGeneratedKeys="true" keyProperty="id"，所以这里可以获取到
 
         //向菜品口味表插入n个数据
-        List<DishFlavor> flavors = dishDTO.getFlavors();//获取菜品口味
+        List<DishFlavor> flavors = dishDTO.getFlavors();//从前端获取到的菜品口味信息
         //判断口味是否为空
         if (flavors != null && flavors.size() > 0){
             for (DishFlavor Dishflavor : flavors) {
@@ -63,22 +64,23 @@ public class DishServiceImpl implements DishService {
     public PageResult pageQuery(DishPageQueryDTO dishPageQueryDTO) {
         log.info("分页查询菜品：{}", dishPageQueryDTO);
         PageHelper.startPage(dishPageQueryDTO.getPage(), dishPageQueryDTO.getPageSize());
-        Page<DishVO> page = dishMapper.pageQuery(dishPageQueryDTO);
+        Page<DishVO> page = dishMapper.pageQuery(dishPageQueryDTO);//返回给前端的数据用vo
         return new PageResult(page.getTotal(), page.getResult());
     }
     @Override
     @Transactional//事务管理，确保数据的一致性
+    //删除菜品的准备条件是：1.菜品不能起售 2.菜品不能被套餐关联，否则不能删除
     public void delete(List<Long> ids) {
         //判断菜品是否起售
       for (Long id : ids){
-          Dish dish = dishMapper.getById(id);
+          Dish dish = dishMapper.getById(id);//根据id查询菜品
           if (dish.getStatus() == 1){
               //菜品起售中，不能删除
               throw new DeletionNotAllowedException(MessageConstant.DISH_ON_SALE);
           }
       }
         //是否被套餐关联,去setmeal_dish中去查询是否有关联
-        List<Long> setmealDishIds = setmealDishMapper.getByDishIds(ids);
+        List<Long> setmealDishIds = setmealDishMapper.getByDishIds(ids);//根据菜品id查询是否被套餐关联
       if (setmealDishIds != null && setmealDishIds.size() > 0){
           log.info("菜品{}被套餐{}关联，不能删除", ids, setmealDishIds);
           throw new DeletionNotAllowedException(MessageConstant.DISH_BE_RELATED_BY_SETMEAL);
@@ -128,5 +130,20 @@ public class DishServiceImpl implements DishService {
             dishFlavorMapper.insertBatch(flavors);
         }
 
+    }
+    @Override
+    //根据分类id查询菜品列表
+    public List<DishVO> list(Long categoryId) {
+        log.info("根据分类id查询菜品列表：{}", categoryId);
+        //创建dish对象，设置id（属于哪个分类）和状态
+        Dish dish = new Dish();
+        dish.setCategoryId(categoryId);
+        dish.setStatus(StatusConstant.ENABLE);//
+        return dishMapper.list(dish);
+    }
+    @Override
+    public void updateStatus(Integer status, Long id) {
+        log.info("根据id修改菜品状态：{}", id);
+        dishMapper.updateStatus(status, id);
     }
 }
