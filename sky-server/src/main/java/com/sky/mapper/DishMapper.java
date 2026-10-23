@@ -38,6 +38,9 @@ public interface DishMapper {
     void update(Dish dish);
 
     List<DishVO> list(Dish dish);
+
+
+
     //根据id修改菜品状态
     void updateStatus(@Param("status") Integer status, @Param("id") Long id);
 }
