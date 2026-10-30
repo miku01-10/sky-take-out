@@ -10,9 +10,11 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 //菜品管理
 @RestController
@@ -23,10 +25,17 @@ public class DishController {
     @Autowired
     private DishService dishService;
     //新增菜品
+    @Autowired
+    private RedisTemplate redisTemplate;
     @PostMapping()
     public Result save(@RequestBody DishDTO dishDTO){
         log.info("新增菜品：{}", dishDTO);
         dishService.saveWithFlavor(dishDTO);
+
+        //清理缓存数据
+        String key = "dish_" + dishDTO.getCategoryId();//构建菜品缓存key
+        redisTemplate.delete(key);//清理缓存数据
+
         return Result.success();
    }
    //分页查询菜品
@@ -43,6 +52,8 @@ public class DishController {
     public Result delete(@RequestParam List<Long> ids){
         log.info("批量删除菜品：{}", ids);
         dishService.delete(ids);
+        //将所有dish_开头的缓存数据都清理掉
+        extracted();
         return Result.success();
     }
     //根据id查询菜品(包含口味)
@@ -60,6 +71,9 @@ public class DishController {
     public Result update(@RequestBody DishDTO dishDTO){
         log.info("修改菜品：{}", dishDTO);
         dishService.updateWithFlavor(dishDTO);
+        //把所有dish_开头的缓存数据都清理掉
+        extracted();
+
         return Result.success();
     }
     //根据id查询菜品，主要是用来套餐中加菜品的
@@ -75,6 +89,13 @@ public class DishController {
     public Result updateStatus(@PathVariable Integer status, @RequestParam Long id){
         log.info("修改菜品状态：{}", status);
         dishService.updateStatus(status, id);
+        //清理缓存数据
+        extracted();
         return Result.success();
+    }
+
+    private void extracted() {
+        Set keys = redisTemplate.keys("dish_*");//获取所有以dish_开头的缓存key
+        redisTemplate.delete(keys);//清理缓存数据
     }
 }

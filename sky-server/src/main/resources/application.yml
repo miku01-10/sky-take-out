@@ -47,7 +47,10 @@ sky:
     user-secret-key: itheima
     user-ttl: 72000000000
     user-token-name: authentication
-
+  shop:
+    address: ${sky.shop.address}
+  baidu:
+    ak: ${sky.baidu.ak}
 
   alioss:
     endpoint: ${sky.alioss.endpoint}
